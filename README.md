@@ -1,2 +1,3 @@
-# raspberry-pi-photo-frame
+# Raspberry Pi Photo Frame
+
 Using a Raspberry Pi as photo frame with a nice Web UI
