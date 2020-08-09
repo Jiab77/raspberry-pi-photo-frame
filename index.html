@@ -60,7 +60,7 @@
                         var array = new Uint32Array(1);
                         window.crypto.getRandomValues(array);
 
-                        var randomPicture = 'https://picsum.photos/' + (window.innerWidth - 50) + '/' + (window.innerHeight - 100) + '?random=' + array[0];
+                        var randomPicture = 'https://picsum.photos/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100) + '?random=' + array[0];
 
                         console.log('Loading new picture [' + randomPicture + '].');
                         $('#slideshow-image')[0].src = randomPicture;
