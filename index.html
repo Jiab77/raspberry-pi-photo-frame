@@ -32,79 +32,15 @@
                 <div class="header">Photo Frame Slideshow</div>
                 <div class="image content">
                     <img id="slideshow-image" class="image transition hidden">
+                    <div class="ui active bottom dimmer">
+                        <div class="content" id="picture-metas"></div>
+                    </div>
                 </div>
                 <!-- <div class="actions"></div> -->
             </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.8.6/semantic.min.js" integrity="sha512-NVlJzayXuSvGMZlWvctk3taLRDlsypiqHywmEyqchhwyCrxBoRKWbwsglb5wtefQQfN4MIZ0tJjgPKLvx4oRaw==" crossorigin="anonymous"></script>
-        <script type="text/javascript">
-            "use strict";
-            $(function (event) {
-                console.group('App');
-                console.info('DOM loaded.', event);
-                console.groupEnd();
-
-                var demoDuration = 60000;
-                var slideshowAnimationEnter = 'fade in';
-                var slideshowAnimationLeave = 'fade out';
-                var slideshowPauseDuration = 5000;
-                var slideshowDisplayDuration = (slideshowPauseDuration - 1000);
-                var animationDuration = 800;
-                var animationLoadingTime = 800;
-                var checkInterval = 100;
-
-                if (window.crypto) {
-                    console.log('Loading demo...');
-                    var demoSlideshow = setInterval(function () {
-                        var array = new Uint32Array(1);
-                        window.crypto.getRandomValues(array);
-
-                        var randomPicture = 'https://picsum.photos/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100) + '?random=' + array[0];
-
-                        console.log('Loading new picture [' + randomPicture + '].');
-                        $('#slideshow-image')[0].src = randomPicture;
-
-                        var checkImage = setInterval(function () {
-                            if ($('#slideshow-image')[0].src !== '') {
-                                if ($('.modal').modal('is active') === false) {
-                                    $('.modal').modal('show');
-                                }
-                                if ($('.ui.basic.inverted.segment').hasClass('loading')) {
-                                    $('.ui.basic.inverted.segment').removeClass('loading');
-                                }
-                                
-                                var delayedAnimation = setTimeout(function () {
-                                    console.log('Picture loaded, running animation.');
-                                    $('#slideshow-image').transition(slideshowAnimationEnter, animationDuration);
-
-                                    clearTimeout(delayedAnimation);
-                                }, animationLoadingTime);
-
-                                clearInterval(checkImage);
-                            }
-                        }, checkInterval);
-
-                        var displayTime = setTimeout(function () {
-                            console.log('Display timeout, hidding picture.');
-                            $('#slideshow-image').transition(slideshowAnimationLeave, animationDuration, function () {
-                                $('#slideshow-image')[0].src = '';
-                            });
-
-                            clearTimeout(displayTime);
-                        }, slideshowDisplayDuration);
-                    }, slideshowPauseDuration);
-
-                    // Kill demo slideshow after defined duration
-                    var demoKiller = setTimeout(function () {
-                        console.log('Demo finished.');
-                        $('.modal').modal('hide');
-
-                        clearInterval(demoSlideshow);
-                        clearTimeout(demoKiller);
-                    }, demoDuration);
-                }
-            });
-        </script>
+        <script src="main.js"></script>
     </body>
 </html>
