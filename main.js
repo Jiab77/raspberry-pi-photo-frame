@@ -3,7 +3,7 @@ $(function (event) {
     console.group('App');
     console.info('DOM loaded.', event);
     console.groupEnd();
-    
+
     // Demo settings
     var loadDemo = true;
     var demoDuration = 60000;
@@ -19,6 +19,7 @@ $(function (event) {
     var animationDuration = 800;
     var animationLoadingTime = 800;
     var checkInterval = 100;
+    var modalHideTimeout = 1000;
 
     // Internal dimmer settings
     $('.image .bottom.dimmer').dimmer({
@@ -33,6 +34,10 @@ $(function (event) {
     function loadSlideshow(images, source) {
         console.log('Loading slideshow...');
         console.log('Loaded image list:', images);
+
+        // Hide mouse cursor during slideshow
+        $('html').css('cursor', 'none');
+
         var limit = images.length;
         var baseURL = imagesPath;
         if (typeof source !== 'undefined') {
@@ -54,41 +59,42 @@ $(function (event) {
                 }
 
                 console.log('No more pictures to display.');
-                $('.ui.basic.inverted.segment').css('cursor', 'default');
+
+                // Show mouse cursor when slideshow is finished
+                $('html').css('cursor', 'default');
+
+                // Update main container content
                 $('.ui.basic.inverted.segment').addClass('very padded center aligned');
                 $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
-    
+
                 var delayedModalHide = setTimeout(function () {
                     $('.modal').modal('hide');
-    
+
                     if ($('.modal').modal('is active') === false) {
                         console.log('Modal closed.');
                     }
-    
+
                     clearTimeout(delayedModalHide);
-                }, 100);
+                }, modalHideTimeout);
 
                 clearInterval(slideshowStop);
             }
-        }, 0);
+        }, slideshowPauseDuration);
 
         // Display all received pictures
         if (limit !== 0) {
             // Load initial picture
             loadPictures(images, baseURL);
-            
+
             // Load all other pictures
             var slideshow = setInterval(function () {
                 // Continue till we have pictures to display
                 if (limit !== 0) {
                     limit--;
-                    console.log('Pictures left:', limit);
-                    loadPictures(images, imagesPath);
-                }
 
-                // Stop slideshow when all pictures are displayed
-                else {
-                    clearInterval(slideshow);
+                    console.log('Pictures left:', limit);
+
+                    loadPictures(images, imagesPath);
                 }
             }, slideshowPauseDuration);
         }
@@ -96,20 +102,22 @@ $(function (event) {
 
     function loadPictures(images, source) {
         var totalImages = images.length;
-        var randomImageId = random(0, totalImages);
+        var randomImageId = random(0, (totalImages-1));
+
+        console.log('==> Random ID:', randomImageId);
 
         if (typeof images[randomImageId] !== 'undefined' && slideshowStopped === false) {
             // Top level images
             if (images[randomImageId].type !== 'folder') {
                 var randomPicture = images[randomImageId];
                 var randomPictureURL = source + '/' + randomPicture.name;
-    
+
                 console.log('New image:', randomPicture);
                 console.log('Loading new picture [' + randomPictureURL + '].');
-    
+
                 // Assign new random image
                 $('#slideshow-image')[0].src = randomPictureURL;
-                
+
                 // Show image with delay
                 var checkImage = setInterval(function () {
                     if ($('#slideshow-image')[0].src !== '') {
@@ -119,23 +127,23 @@ $(function (event) {
                         if ($('.ui.basic.inverted.segment').hasClass('loading')) {
                             $('.ui.basic.inverted.segment').removeClass('loading');
                         }
-                        
+
                         var delayedAnimation = setTimeout(function () {
                             console.log('Picture loaded, running animation.');
                             $('#slideshow-image').transition(slideshowAnimationEnter, animationDuration);
-    
+
                             if (typeof randomPicture.name !== 'undefined') {
                                 $('#picture-metas').html('<p><strong>File</strong>&nbsp;&ndash;&nbsp;<span>' + randomPicture.name + '</span></p><p></p>');
                                 $('.image .bottom.dimmer').dimmer('show');
                             }
-    
+
                             clearTimeout(delayedAnimation);
                         }, animationLoadingTime);
-    
+
                         clearInterval(checkImage);
                     }
                 }, checkInterval);
-    
+
                 // Hide image nicely
                 var displayTime = setTimeout(function () {
                     if ($('#slideshow-image')[0].src !== '') {
@@ -145,7 +153,7 @@ $(function (event) {
                             $('#slideshow-image')[0].src = '';
                         });
                     }
-    
+
                     clearTimeout(displayTime);
                 }, slideshowDisplayDuration);
             }
@@ -155,7 +163,8 @@ $(function (event) {
                 console.log('Sub folder found:', images[randomImageId].name);
                 console.log('Sub folder content:', images[randomImageId].children);
                 console.log('Sub folder path:', source + '/' + images[randomImageId].name);
-                loadSlideshow(images[randomImageId].children, source + '/' + images[randomImageId].name);
+
+                loadPictures(images[randomImageId].children, source + '/' + images[randomImageId].name);
             }
         }
     }
@@ -163,6 +172,9 @@ $(function (event) {
     function loadDemoSlideshow(images) {
         console.log('Loading demo slideshow...');
         console.log('Loaded image list:', images);
+
+        // Hide mouse cursor during slideshow
+        $('html').css('cursor', 'none');
 
         var limit = images.length;
         var imagesPath = 'https://picsum.photos/id/';
@@ -180,7 +192,11 @@ $(function (event) {
             }
 
             console.log('End of demo.');
-            $('.ui.basic.inverted.segment').css('cursor', 'default');
+
+            // Show mouse cursor when slideshow is finished
+            $('html').css('cursor', 'default');
+
+            // Update main container content
             $('.ui.basic.inverted.segment').addClass('very padded center aligned');
             $('.ui.basic.inverted.segment').html('<h1>End of demo</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
 
@@ -192,7 +208,7 @@ $(function (event) {
                 }
 
                 clearTimeout(delayedModalHide);
-            }, 100);
+            }, modalHideTimeout);
 
             clearTimeout(demoStop);
         }, demoDuration);
@@ -201,19 +217,16 @@ $(function (event) {
         if (limit !== 0) {
             // Load initial picture
             loadDemoPictures(images, imagesPath);
-            
+
             // Load all other pictures
             var slideshow = setInterval(function () {
                 // Continue till we have pictures to display
                 if (limit !== 0) {
                     limit--;
-                    console.log('Pictures left:', limit);
-                    loadDemoPictures(images, imagesPath);
-                }
 
-                // Stop slideshow when all pictures are displayed
-                else {
-                    clearInterval(slideshow);
+                    console.log('Pictures left:', limit);
+                    
+                    loadDemoPictures(images, imagesPath);
                 }
             }, slideshowPauseDuration);
         }
@@ -221,7 +234,9 @@ $(function (event) {
 
     function loadDemoPictures(images, source) {
         var totalImages = images.length;
-        var randomImageId = random(0, totalImages);
+        var randomImageId = random(0, (totalImages-1));
+
+        console.log('==> Random ID:', randomImageId);
 
         if (typeof images[randomImageId] !== 'undefined' && demoStopped === false) {
             var randomPicture = images[randomImageId];
@@ -232,7 +247,7 @@ $(function (event) {
 
             // Assign new random image
             $('#slideshow-image')[0].src = randomPictureURL;
-            
+
             // Show image with delay
             var checkImage = setInterval(function () {
                 if ($('#slideshow-image')[0].src !== '') {
@@ -242,7 +257,7 @@ $(function (event) {
                     if ($('.ui.basic.inverted.segment').hasClass('loading')) {
                         $('.ui.basic.inverted.segment').removeClass('loading');
                     }
-                    
+
                     var delayedAnimation = setTimeout(function () {
                         console.log('Picture loaded, running animation.');
                         $('#slideshow-image').transition(slideshowAnimationEnter, animationDuration);
