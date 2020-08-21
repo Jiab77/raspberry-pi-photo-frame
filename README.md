@@ -41,6 +41,9 @@ Download [NoMachine](https://www.nomachine.com/) to control remotely the Raspber
 # Copy the package
 scp nomachine_6.11.2_1_armhf.deb ubuntu@your-pi-host:~/
 
+# Connect to the host
+ssh ubuntu@your-pi-host
+
 # Install the package
 sudo dpkg -i nomachine_6.11.2_1_armhf.deb
 ```
