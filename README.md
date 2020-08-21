@@ -93,9 +93,33 @@ killall -KILL node
 
 Save it as `start-slideshow.sh` and make it executable with: `chmod -v +x start-slideshow.sh`.
 
-## Add the script in desktop autostart
+### Add the script in desktop autostart
 
 TODO
+
+## Add your pictures
+
+To add your pictures to the project, simply create the `images` folder at the root of the project:
+
+```bash
+# Move to the project folder
+cd raspberry-pi-photo-frame
+
+# Create the images folders
+mkdir -v images
+```
+
+Now you can copy your pictures inside:
+
+```bash
+# Move to your local pictures folder
+cd ~/Images
+
+# Copy them to your pi host
+scp -r ~/Images/* ubuntu@your-pi-host:~/raspberry-pi-photo-frame/images/
+```
+
+Once done, make sure that the demo mode is disabled. You can now refresh your current window or rerun the starting script. :tada:
 
 ## Preview
 
