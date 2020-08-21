@@ -119,7 +119,7 @@ cd ~/Images
 scp -r ~/Images/* ubuntu@your-pi-host:~/raspberry-pi-photo-frame/images/
 ```
 
-Once done, make sure that the demo mode is disabled. You can now refresh your current window or rerun the starting script. :tada:
+Once done, make sure that the demo mode is disabled. You can now refresh your current window or re-run the starting script. :tada:
 
 ## Preview
 
