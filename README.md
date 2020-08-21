@@ -35,7 +35,7 @@ sudo apt install chromium-browser chromium-browser-l10n
 sudo reboot
 ```
 
-Download [NoMachine](https://www.nomachine.com/) to control remotely the Raspberry Pi from [here](https://www.nomachine.com/download/linux&id=29&s=Raspberry) and copy the `.deb` package to your Raspberry Pi:
+Download [NoMachine](https://www.nomachine.com/) to control remotely the Raspberry Pi from [here](https://www.nomachine.com/download/linux&id=29&s=Raspberry) and copy the `.deb` package with `scp`:
 
 ```bash
 # Copy the package
@@ -45,7 +45,7 @@ scp nomachine_6.11.2_1_armhf.deb ubuntu@your-pi-host:~/
 sudo dpkg -i nomachine_6.11.2_1_armhf.deb
 ```
 
-> This package correspond to the ARMv7 version.
+> This package is for the ARMv7 version.
 
 ## Clone the project
 
@@ -53,7 +53,7 @@ sudo dpkg -i nomachine_6.11.2_1_armhf.deb
 git clone https://github.com/Jiab77/raspberry-pi-photo-frame.git
 ```
 
-## Disable demo mode
+### Disable demo mode
 
 By default it will display pictures from [Lorem Picsum](https://picsum.photos/).
 
@@ -67,7 +67,7 @@ var demoDuration = 60000;
 
 You can also change the demo duration if you leave `loadDemo` as `true` by changing the value of `demoDuration`. The value is in milliseconds.
 
-## Start script
+### Create startup script
 
 Now to autostart Chromium with the slideshow, simply create the following starting script:
 
