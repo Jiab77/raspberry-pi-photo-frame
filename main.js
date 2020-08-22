@@ -379,7 +379,11 @@ $(function (event) {
                                 html += '</p>';
 
                             $('#picture-metas').html(html);
-                            $('.image .bottom.dimmer').dimmer('show');
+
+                            var delayedDimmerAnimation = setTimeout(function () {
+                                $('.image .bottom.dimmer').dimmer('show');
+                                clearTimeout(delayedDimmerAnimation);
+                            }, animationLoadingTime);
                         }
 
                         clearTimeout(delayedAnimation);
