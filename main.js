@@ -184,7 +184,7 @@ $(function (event) {
                 $('#slideshow-image')[0].src = randomPictureURL;
                 // $('#slideshow-image')[0].width = (window.innerWidth - 40);
                 // $('#slideshow-image')[0].height = (window.innerHeight - 100);
-                $('#slideshow-image')[0].height = (window.innerHeight + 100);
+                $('#slideshow-image')[0].height = (window.innerHeight - 10);
                 // $('#slideshow-image').css('height', '93vh');
                 // $('#slideshow-image')[0].height = (window.innerHeight - 100) * (window.innerWidth - 40) / $('#slideshow-image')[0].width;
                 // $('#slideshow-image')[0].width = (window.innerWidth - 40);
@@ -345,7 +345,7 @@ $(function (event) {
         if (typeof images[randomImageId] !== 'undefined' && demoStopped === false) {
             var randomPicture = images[randomImageId];
             // var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100);
-            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight + 100);
+            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 10);
 
             console.log('New image:', randomPicture);
             console.log('Loading new picture [' + randomPictureURL + '].');
