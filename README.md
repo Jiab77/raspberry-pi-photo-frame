@@ -165,6 +165,9 @@ Now to autostart Chromium with the slideshow, simply create the following starti
 ```bash
 #!/bin/bash
 
+# Wait for desktop start
+sleep 60
+
 # Start server
 cd raspberry-pi-photo-frame
 NODE_WEB_HOST=0.0.0.0 node server/server.js &
