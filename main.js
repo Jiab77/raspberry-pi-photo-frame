@@ -172,7 +172,7 @@ $(function (event) {
                 var parsedName = String(randomPicture.name).split('.');
                 var fileExtension = parsedName[(parsedName.length-1)];
                 console.log('Analyzing file extension...', fileExtension);
-                if (String(fileExtension).toLowerCase() === 'mp4') {
+                if (String(fileExtension).toLowerCase() === 'mp4' || String(fileExtension).toLowerCase() === '3gp') {
                     console.log('Video detected, skipping item...');
                     return;
                 }
