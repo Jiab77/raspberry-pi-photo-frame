@@ -232,6 +232,30 @@ scp -r ~/Images/* ubuntu@your-pi-host:~/raspberry-pi-photo-frame/images/
 
 Once done, make sure that the demo mode is disabled. You can now refresh your current window or re-run the starting script. :tada:
 
+## Update the code
+
+If you want to get the latest version, here is the simpliest way to do so:
+
+```bash
+# Stop the current browser instance
+killall -KILL chromium-browser
+
+# Move to the project folder
+cd raspberry-pi-photo-frame
+
+# Cancel your local changes
+git checkout main.js
+
+# Get the latest version
+git pull
+
+# Disable demo mode
+sed -e 's/loadDemo = true/loadDemo = false/' -i main.js
+
+# Restart the slideshow
+~/start-slideshow.sh
+```
+
 ## Preview
 
 ![image](https://user-images.githubusercontent.com/9881407/90090657-df1cf700-dd24-11ea-9743-a841420c4545.png)
