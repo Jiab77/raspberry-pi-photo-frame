@@ -26,6 +26,32 @@ $(function (event) {
         transition: 'fade up',
     });
 
+    // Fullscreen event handler
+    document.addEventListener("keypress", function(e) {
+        if (e.keyCode === 13) {
+            toggleFullScreen();
+        }
+    }, false);
+
+    // Fullscreen function
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            console.log('Init fullscreen...');
+            document.documentElement.requestFullscreen();
+
+            // Hide slideshow header nicely
+            console.log('Hiding slideshow header...');
+            $('.ui.overlay.fullscreen.inverted.modal .header').hide('show');
+        }
+        else {
+            // User entered 'Esc' key
+            if (document.exitFullscreen) {
+                console.log('Exit fullscreen...');
+                document.exitFullscreen();
+            }
+        }
+    }
+
     function random(min, max) {
         const num = Math.floor(Math.random() * (max - min + 1)) + min;
         return num;
@@ -37,6 +63,16 @@ $(function (event) {
 
         // Hide mouse cursor during slideshow
         $('html').css('cursor', 'none');
+
+        // Adjust slideshow size
+        if (document.fullscreenElement) {
+            $('.image.content.dimmable').css('height', '99vh');
+            // $('#slideshow-image').css('height', '100vh');
+        }
+        else {
+            $('.image.content.dimmable').css('height', '93vh');
+            // $('#slideshow-image').css('height', '93vh');
+        }
 
         var limit = images.length;
         var baseURL = imagesPath;
@@ -92,6 +128,22 @@ $(function (event) {
                 if (limit !== 0) {
                     limit--;
 
+                    // Display slideshow header nicely
+                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                        console.log('Display slideshow header...');
+                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                    }
+
+                    // Adjust slideshow size
+                    if (document.fullscreenElement) {
+                        $('.image.content.dimmable').css('height', '99vh');
+                        // $('#slideshow-image').css('height', '100%');
+                    }
+                    else {
+                        $('.image.content.dimmable').css('height', '93vh');
+                        // $('#slideshow-image').css('height', '93vh');
+                    }
+
                     console.log('Pictures left:', limit);
 
                     loadPictures(images, imagesPath);
@@ -112,11 +164,26 @@ $(function (event) {
                 var randomPicture = images[randomImageId];
                 var randomPictureURL = source + '/' + randomPicture.name;
 
+                // Avoid displaying videos for now
+                var parsedName = String(randomPicture.name).split('.');
+                var fileExtension = parsedName[(parsedName.length-1)];
+                console.log('Analyzing file extension...', fileExtension);
+                if (String(fileExtension).toLowerCase() === 'mp4') {
+                    console.log('Video detected, skipping item...');
+                    return;
+                }
+
                 console.log('New image:', randomPicture);
                 console.log('Loading new picture [' + randomPictureURL + '].');
 
                 // Assign new random image
                 $('#slideshow-image')[0].src = randomPictureURL;
+                // $('#slideshow-image')[0].width = (window.innerWidth - 40);
+                // $('#slideshow-image')[0].height = (window.innerHeight - 100);
+                $('#slideshow-image')[0].height = (window.innerHeight + 100);
+                // $('#slideshow-image').css('height', '93vh');
+                // $('#slideshow-image')[0].height = (window.innerHeight - 100) * (window.innerWidth - 40) / $('#slideshow-image')[0].width;
+                // $('#slideshow-image')[0].width = (window.innerWidth - 40);
 
                 // Show image with delay
                 var checkImage = setInterval(function () {
@@ -133,7 +200,14 @@ $(function (event) {
                             $('#slideshow-image').transition(slideshowAnimationEnter, animationDuration);
 
                             if (typeof randomPicture.name !== 'undefined') {
-                                $('#picture-metas').html('<p><strong>File</strong>&nbsp;&ndash;&nbsp;<span>' + randomPicture.name + '</span></p><p></p>');
+                                var html  = '<div class="ui basic left aligned segment">';
+                                    html += '<strong>File:</strong>&nbsp;<span>' + randomPicture.name + '</span>';
+                                    // html += '&nbsp;&ndash;&nbsp;';
+                                    html += '<br><br>';
+                                    html += '<strong>Date:</strong>&nbsp;<span>' + randomPicture.time + '</span>';
+                                    html += '</div>';
+
+                                $('#picture-metas').html(html);
                                 $('.image .bottom.dimmer').dimmer('show');
                             }
 
@@ -225,7 +299,7 @@ $(function (event) {
                     limit--;
 
                     console.log('Pictures left:', limit);
-                    
+
                     loadDemoPictures(images, imagesPath);
                 }
             }, slideshowPauseDuration);
