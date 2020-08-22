@@ -50,6 +50,94 @@ sudo dpkg -i nomachine_6.11.2_1_armhf.deb
 
 > This package is for the ARMv7 version.
 
+## Increase RAM
+
+The default RAM size is not enough to run the project smoothly, so you need to increase the available memory size with __Zram__.
+
+Create the loading script:
+
+```bash
+sudo nano /usr/bin/zram.sh
+```
+
+And place this content:
+
+```bash
+#!/bin/bash
+
+echo -e "\nExpanding available memory with zRAM...\n"
+cores=$(nproc --all)
+modprobe zram num_devices=$cores
+modprobe zstd
+modprobe lz4hc_compress
+
+swapoff -a
+
+totalmem=`free | grep -e "^Mem:" | awk '{print $2}'`
+#mem=$(( ($totalmem / $cores)* 1024 ))
+mem=$(( ($totalmem * 4 / 3 / $cores)* 1024 ))
+
+core=0
+while [ $core -lt $cores ]; do
+    echo zstd > /sys/block/zram$core/comp_algorithm 2>/dev/null ||
+    echo lz4hc > /sys/block/zram$core/comp_algorithm 2>/dev/null ||
+    echo lz4 > /sys/block/zram$core/comp_algorithm 2>/dev/null
+    echo $mem > /sys/block/zram$core/disksize
+    mkswap /dev/zram$core
+    swapon -p 5 /dev/zram$core
+    let core=core+1
+done
+```
+
+> The [zstd](https://github.com/facebook/zstd) compression algorithm has been used for better performance results.
+>
+> It might not be supported on all systems, that's why I've added some other compression algorithms.
+
+Then save it with `[Ctrl+O]` and `[Ctrl+X]`.
+
+Make it executable:
+
+```bash
+sudo chmod -v +x /usr/bin/zram.sh
+```
+
+Then create the boot script:
+
+```
+sudo nano /etc/rc.local
+```
+
+And place this content:
+
+```bash
+#!/bin/bash
+
+/usr/bin/zram.sh &
+
+exit 0
+```
+
+Then save it with `[Ctrl+O]` and `[Ctrl+X]`.
+
+Make it executable:
+
+```bash
+sudo chmod -v +x /etc/rc.local
+```
+
+To finish, run the script to create the additional memory. To see the available memory and the compression stats, run the following commands:
+
+```bash
+# Manual start
+sudo /usr/bin/zram.sh
+
+# Show memory compression stats
+zramctl
+
+# Show available memory
+free -mlht
+```
+
 ## Clone the project
 
 ```bash
