@@ -14,7 +14,7 @@ $(function (event) {
     var slideshowStopped = false;
     var slideshowAnimationEnter = 'fade in';
     var slideshowAnimationLeave = 'fade out';
-    var slideshowPauseDuration = 5000;
+    var slideshowPauseDuration = 8000;
     var slideshowDisplayDuration = (slideshowPauseDuration - 1000);
     var animationDuration = 800;
     var animationLoadingTime = 800;
@@ -212,7 +212,11 @@ $(function (event) {
                                     html += '</div>';
 
                                 $('#picture-metas').html(html);
-                                $('.image .bottom.dimmer').dimmer('show');
+
+                                var delayedDimmerAnimation = setTimeout(function () {
+                                    $('.image .bottom.dimmer').dimmer('show');
+                                    clearTimeout(delayedDimmerAnimation);
+                                }, animationLoadingTime);
                             }
 
                             clearTimeout(delayedAnimation);
