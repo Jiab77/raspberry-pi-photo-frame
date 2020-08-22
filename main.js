@@ -64,6 +64,10 @@ $(function (event) {
         // Hide mouse cursor during slideshow
         $('html').css('cursor', 'none');
 
+        // Changing metas display style (required for left alignment)
+        $('#picture-metas').css('width', 'inherit');
+        $('#picture-metas').css('padding-left', '1.2rem');
+
         // Adjust slideshow size
         if (document.fullscreenElement) {
             $('.image.content.dimmable').css('height', '99vh');
@@ -250,6 +254,16 @@ $(function (event) {
         // Hide mouse cursor during slideshow
         $('html').css('cursor', 'none');
 
+        // Adjust slideshow size
+        if (document.fullscreenElement) {
+            $('.image.content.dimmable').css('height', '99vh');
+            // $('#slideshow-image').css('height', '100vh');
+        }
+        else {
+            $('.image.content.dimmable').css('height', '93vh');
+            // $('#slideshow-image').css('height', '93vh');
+        }
+
         var limit = images.length;
         var imagesPath = 'https://picsum.photos/id/';
 
@@ -298,6 +312,22 @@ $(function (event) {
                 if (limit !== 0) {
                     limit--;
 
+                    // Display slideshow header nicely
+                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                        console.log('Display slideshow header...');
+                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                    }
+
+                    // Adjust slideshow size
+                    if (document.fullscreenElement) {
+                        $('.image.content.dimmable').css('height', '99vh');
+                        // $('#slideshow-image').css('height', '100%');
+                    }
+                    else {
+                        $('.image.content.dimmable').css('height', '93vh');
+                        // $('#slideshow-image').css('height', '93vh');
+                    }
+
                     console.log('Pictures left:', limit);
 
                     loadDemoPictures(images, imagesPath);
@@ -314,7 +344,8 @@ $(function (event) {
 
         if (typeof images[randomImageId] !== 'undefined' && demoStopped === false) {
             var randomPicture = images[randomImageId];
-            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100);
+            // var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100);
+            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight + 100);
 
             console.log('New image:', randomPicture);
             console.log('Loading new picture [' + randomPictureURL + '].');
@@ -337,7 +368,13 @@ $(function (event) {
                         $('#slideshow-image').transition(slideshowAnimationEnter, animationDuration);
 
                         if (typeof randomPicture.author !== 'undefined') {
-                            $('#picture-metas').html('<p><strong>Author</strong>&nbsp;&ndash;&nbsp;<span>' + randomPicture.author + '</span></p><p></p>');
+                            var html  = '<p>';
+                                html += '<strong>Author</strong>';
+                                html += '&nbsp;&ndash;&nbsp;';
+                                html += '<span>' + randomPicture.author + '</span>';
+                                html += '</p>';
+
+                            $('#picture-metas').html(html);
                             $('.image .bottom.dimmer').dimmer('show');
                         }
 
