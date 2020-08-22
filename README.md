@@ -95,7 +95,27 @@ Save it as `start-slideshow.sh` and make it executable with: `chmod -v +x start-
 
 ### Add the script in desktop autostart
 
-TODO
+According to the documentation, you simply add a new line in `~/.config/lxsession/LXDE/autostart`:
+
+```bash
+# Add new startup line
+echo "@${HOME}/start-slideshow.sh" | tee -a ~/.config/lxsession/LXDE/autostart
+
+# Verify the result
+cat ~/.config/lxsession/LXDE/autostart
+```
+
+> The path might differ on your side.
+
+Restart to see the result.
+
+> To remove from autostart, simply delete or comment the line from `~/.config/lxsession/LXDE/autostart`:
+>
+> ```bash
+> sed -e 's|@'${HOME}'/start-slideshow.sh|# @'${HOME}'/start-slideshow.sh|' -i ~/.config/lxsession/LXDE/autostart
+> ```
+>
+> Then restart.
 
 ## Add your pictures
 
