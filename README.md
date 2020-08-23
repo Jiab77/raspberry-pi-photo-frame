@@ -144,19 +144,53 @@ free -mlht
 git clone https://github.com/Jiab77/raspberry-pi-photo-frame.git
 ```
 
-### Disable demo mode
+### Settings
+
+#### Demo
 
 By default it will display pictures from [Lorem Picsum](https://picsum.photos/).
 
-Edit the file `main.js` and change `loadDemo` from `true` to `false` as shown:
+Edit the file `main.js` to the following settings:
 
 ```js
 // Demo settings
-var loadDemo = false;
+var loadDemo = true;
 var demoDuration = 60000;
+var infiniteDemo = true;
 ```
 
-You can also change the demo duration if you leave `loadDemo` as `true` by changing the value of `demoDuration`. The value is in milliseconds.
+Effects:
+
+* `loadDemo`: (`true`|`false`) - Enable / disable the demo mode
+* `demoDuration`: (duration in milliseconds) - Change the demo duration
+* `infiniteDemo`: (`true`|`false`) - Make the demo infinite or not
+
+#### Slideshow
+
+By default the slideshow is now infinite instead of stopping when all pictures are displayed.
+
+Edit the file `main.js` to the following settings:
+
+```js
+// Slideshow settings
+var imagesPath = '/images';
+var infiniteSlideshow = true;
+var slideshowAnimationEnter = 'fade in';
+var slideshowAnimationLeave = 'fade out';
+var slideshowPauseDuration = 8000;
+var animationDuration = 800;
+var animationLoadingTime = 800;
+```
+
+Effects:
+
+* `imagesPath`: (`/images`) - Define the path to folder that contains pictures to display
+* `infiniteSlideshow`: (`true`|`false`) - Make the slideshow infinite or stop when all pictures are displayed
+* `slideshowAnimationEnter`: (`fade in`) - Picture display animation
+* `slideshowAnimationLeave`: (`fade out`) - Picture hide animation
+* `slideshowPauseDuration`: (duration in milliseconds) - Waiting time duration before changing picture
+* `animationDuration`: (duration in milliseconds) - Display animation duration
+* `animationLoadingTime`: (duration in milliseconds) - Waiting time duration before running display animation
 
 ### Create startup script
 
@@ -166,7 +200,7 @@ Now to autostart Chromium with the slideshow, simply create the following starti
 #!/bin/bash
 
 # Wait for desktop start
-sleep 60
+sleep 30
 
 # Start server
 cd raspberry-pi-photo-frame
@@ -227,8 +261,10 @@ Now you can copy your pictures inside:
 cd ~/Images
 
 # Copy them to your pi host
-scp -r ~/Images/* ubuntu@your-pi-host:~/raspberry-pi-photo-frame/images/
+rsync -aHXhixv --numeric-ids --progress --partial --append-verify --size-only --stats --min-size=1 --prune-empty-dirs -e "ssh -T -c aes128-gcm@openssh.com -o Compression=no -x" ~/Images/* ubuntu@your-pi-host:~/raspberry-pi-photo-frame/images/
 ```
+
+> This command will preserve date and time attributes.
 
 Once done, make sure that the demo mode is disabled. You can now refresh your current window or re-run the starting script. :tada:
 
