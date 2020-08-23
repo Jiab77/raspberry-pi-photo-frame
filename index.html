@@ -20,6 +20,10 @@
             .ui.dimmer.modals {
                 overflow: hidden !important;
             }
+
+            #slideshow-image-wrapper {
+                margin: 0 auto;
+            }
         </style>
     </head>
     <body>
@@ -27,12 +31,13 @@
             <div class="ui overlay fullscreen inverted modal">
                 <div class="header">Photo Frame Slideshow</div>
                 <div class="image content">
-                    <img id="slideshow-image" class="image transition hidden">
-                    <div class="ui active bottom dimmer">
-                        <div class="content" id="picture-metas"></div>
+                    <div id="slideshow-image-wrapper">
+                        <img id="slideshow-image" class="image transition hidden">
+                        <div class="ui bottom dimmer">
+                            <div class="content" id="picture-metas"></div>
+                        </div>
                     </div>
                 </div>
-                <!-- <div class="actions"></div> -->
             </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
