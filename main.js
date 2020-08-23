@@ -7,17 +7,21 @@ $(function (event) {
     // Demo settings
     var loadDemo = true;
     var demoDuration = 60000;
-    var demoStopped = false;
+    var infiniteDemo = true;
 
     // Slideshow settings
     var imagesPath = '/images';
-    var slideshowStopped = false;
+    var infiniteSlideshow = true;
     var slideshowAnimationEnter = 'fade in';
     var slideshowAnimationLeave = 'fade out';
     var slideshowPauseDuration = 8000;
-    var slideshowDisplayDuration = (slideshowPauseDuration - 1000);
     var animationDuration = 800;
     var animationLoadingTime = 800;
+
+    // Do not change settings below
+    var demoStopped = false;
+    var slideshowStopped = false;
+    var slideshowDisplayDuration = (slideshowPauseDuration - 1000);
     var checkInterval = 100;
     var modalHideTimeout = 1000;
 
@@ -26,11 +30,18 @@ $(function (event) {
         transition: 'fade up',
     });
 
-    // Fullscreen event handler
+    // Fullscreen event handler on keypress
     document.addEventListener("keypress", function(e) {
         if (e.keyCode === 13) {
+            console.log('User want to go fullscreen.', e);
             toggleFullScreen();
         }
+    }, false);
+
+    // Fullscreen event handler on double click
+    document.addEventListener("dblclick", function(e) {
+        console.log('User want to go fullscreen.', e);
+        toggleFullScreen();
     }, false);
 
     // Fullscreen function
@@ -60,6 +71,7 @@ $(function (event) {
     function loadSlideshow(images, source) {
         console.log('Loading slideshow...');
         console.log('Loaded image list:', images);
+        console.log('Slideshow mode:', (infiniteSlideshow !== true ? 'Ends when all pictures are displayed' : 'Infinite'));
 
         // Hide mouse cursor during slideshow
         $('html').css('cursor', 'none');
@@ -70,12 +82,10 @@ $(function (event) {
 
         // Adjust slideshow size
         if (document.fullscreenElement) {
-            $('.image.content.dimmable').css('height', '99vh');
-            // $('#slideshow-image').css('height', '100vh');
+            $('.image.content .dimmable').css('height', '97vh');
         }
         else {
-            $('.image.content.dimmable').css('height', '93vh');
-            // $('#slideshow-image').css('height', '93vh');
+            $('.image.content .dimmable').css('height', '90vh');
         }
 
         var limit = images.length;
@@ -88,71 +98,135 @@ $(function (event) {
         console.log('Total pictures:', limit);
         console.log('Base URL:', baseURL);
 
-        // Stop slideshow when all pictures are displayed
-        var slideshowStop = setInterval(function () {
-            if (limit === 0) {
-                slideshowStopped = true;
+        // Linear slideshow
+        if (infiniteSlideshow === false) {
+            // Stop slideshow when all pictures are displayed
+            var slideshowStop = setInterval(function () {
+                if (limit === 0) {
+                    slideshowStopped = true;
 
-                if (slideshow) {
-                    console.log('Slideshow finished.');
-                    clearInterval(slideshow);
+                    if (slideshow) {
+                        console.log('Slideshow finished.');
+                        clearInterval(slideshow);
+                    }
+
+                    console.log('No more pictures to display.');
+
+                    // Show mouse cursor when slideshow is finished
+                    $('html').css('cursor', 'default');
+
+                    // Update main container content
+                    $('.ui.basic.inverted.segment').addClass('very padded center aligned');
+                    $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
+
+                    var delayedModalHide = setTimeout(function () {
+                        $('.modal').modal('hide');
+
+                        if ($('.modal').modal('is active') === false) {
+                            console.log('Modal closed.');
+                        }
+
+                        clearTimeout(delayedModalHide);
+                    }, modalHideTimeout);
+
+                    clearInterval(slideshowStop);
                 }
+            }, slideshowPauseDuration);
 
-                console.log('No more pictures to display.');
+            // Display all received pictures
+            if (limit !== 0) {
+                // Load initial picture
+                loadPictures(images, baseURL);
+
+                // Load all other pictures
+                var slideshow = setInterval(function () {
+                    // Continue till we have pictures to display
+                    if (limit !== 0) {
+                        limit--;
+
+                        // Display slideshow header nicely
+                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                            console.log('Display slideshow header...');
+                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                        }
+
+                        // Adjust slideshow size
+                        if (document.fullscreenElement) {
+                            $('.image.content .dimmable').css('height', '97vh');
+                        }
+                        else {
+                            $('.image.content .dimmable').css('height', '90vh');
+                        }
+
+                        console.log('Pictures left:', limit);
+
+                        loadPictures(images, imagesPath);
+                    }
+                }, slideshowPauseDuration);
+            }
+        }
+
+        // Infinite slideshow
+        else {
+            // Display all received pictures
+            if (limit !== 0) {
+                // Load initial picture
+                loadPictures(images, baseURL);
+
+                // Load all other pictures
+                var slideshow = setInterval(function () {
+                    // Continue till we have pictures to display
+                    if (limit !== 0) {
+                        limit--;
+
+                        // Display slideshow header nicely
+                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                            console.log('Display slideshow header...');
+                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                        }
+
+                        // Adjust slideshow size
+                        if (document.fullscreenElement) {
+                            $('.image.content .dimmable').css('height', '97vh');
+                        }
+                        else {
+                            $('.image.content .dimmable').css('height', '90vh');
+                        }
+
+                        console.log('Pictures left:', limit);
+
+                        loadPictures(images, imagesPath);
+                    }
+                }, slideshowPauseDuration);
+            }
+
+            // All pictures displayed, reloading
+            else {
+                console.log('End of slideshow.');
+                console.log('Reloading in 5 seconds...');
 
                 // Show mouse cursor when slideshow is finished
                 $('html').css('cursor', 'default');
 
                 // Update main container content
                 $('.ui.basic.inverted.segment').addClass('very padded center aligned');
-                $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
+                $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" id="btnReload">Reloading...</button>');
 
-                var delayedModalHide = setTimeout(function () {
-                    $('.modal').modal('hide');
+                // Reload counter
+                var reloadTimeInSeconds = 5;
+                var reloadCounter = setInterval(function () {
+                    $('#btnReload').html('Reload in ' + reloadTimeInSeconds + ' seconds...');
 
-                    if ($('.modal').modal('is active') === false) {
-                        console.log('Modal closed.');
+                    reloadTimeInSeconds--;
+
+                    if (reloadTimeInSeconds === 0) {
+                        // Reload slideshow
+                        loadSlideshow(images);
+
+                        clearInterval(reloadCounter);
                     }
-
-                    clearTimeout(delayedModalHide);
-                }, modalHideTimeout);
-
-                clearInterval(slideshowStop);
+                }, 1000);
             }
-        }, slideshowPauseDuration);
-
-        // Display all received pictures
-        if (limit !== 0) {
-            // Load initial picture
-            loadPictures(images, baseURL);
-
-            // Load all other pictures
-            var slideshow = setInterval(function () {
-                // Continue till we have pictures to display
-                if (limit !== 0) {
-                    limit--;
-
-                    // Display slideshow header nicely
-                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                        console.log('Display slideshow header...');
-                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
-                    }
-
-                    // Adjust slideshow size
-                    if (document.fullscreenElement) {
-                        $('.image.content.dimmable').css('height', '99vh');
-                        // $('#slideshow-image').css('height', '100%');
-                    }
-                    else {
-                        $('.image.content.dimmable').css('height', '93vh');
-                        // $('#slideshow-image').css('height', '93vh');
-                    }
-
-                    console.log('Pictures left:', limit);
-
-                    loadPictures(images, imagesPath);
-                }
-            }, slideshowPauseDuration);
         }
     }
 
@@ -168,12 +242,30 @@ $(function (event) {
                 var randomPicture = images[randomImageId];
                 var randomPictureURL = source + '/' + randomPicture.name;
 
+                console.log('Analyzing file extension...');
+
                 // Avoid displaying videos for now
                 var parsedName = String(randomPicture.name).split('.');
                 var fileExtension = parsedName[(parsedName.length-1)];
-                console.log('Analyzing file extension...', fileExtension);
+
+                // Gather time details
+                var fileDate = new Date(Date.parse(randomPicture.time));
+                var fileDateLang = window.navigator.language;
+                var fileDateOptions = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+
+                console.log('Found extension:', fileExtension);
+
                 if (String(fileExtension).toLowerCase() === 'mp4' || String(fileExtension).toLowerCase() === '3gp') {
-                    console.log('Video detected, skipping item...');
+                    console.log('Video detected, skipping it...');
+                    loadPictures(images, source);
                     return;
                 }
 
@@ -183,9 +275,9 @@ $(function (event) {
                 // Assign new random image
                 $('#slideshow-image')[0].src = randomPictureURL;
                 // $('#slideshow-image')[0].width = (window.innerWidth - 40);
-                // $('#slideshow-image')[0].height = (window.innerHeight - 100);
-                $('#slideshow-image')[0].height = (window.innerHeight - 10);
-                // $('#slideshow-image').css('height', '93vh');
+                $('#slideshow-image')[0].height = (document.fullscreenElement ? (window.innerHeight - 40) : (window.innerHeight - 100));
+                // $('#slideshow-image')[0].height = (window.innerHeight - 10);
+                // $('#slideshow-image').css('height', '90vh');
                 // $('#slideshow-image')[0].height = (window.innerHeight - 100) * (window.innerWidth - 40) / $('#slideshow-image')[0].width;
                 // $('#slideshow-image')[0].width = (window.innerWidth - 40);
 
@@ -208,12 +300,13 @@ $(function (event) {
                                     html += '<strong>File:</strong>&nbsp;<span>' + randomPicture.name + '</span>';
                                     // html += '&nbsp;&ndash;&nbsp;';
                                     html += '<br><br>';
-                                    html += '<strong>Date:</strong>&nbsp;<span>' + randomPicture.time + '</span>';
+                                    html += '<strong>Date:</strong>&nbsp;<span>' + fileDate.toLocaleDateString(fileDateLang, fileDateOptions) + '</span>';
                                     html += '</div>';
 
                                 $('#picture-metas').html(html);
 
                                 var delayedDimmerAnimation = setTimeout(function () {
+                                    console.log('Picture loaded, showing dimmer.');
                                     $('.image .bottom.dimmer').dimmer('show');
                                     clearTimeout(delayedDimmerAnimation);
                                 }, animationLoadingTime);
@@ -229,10 +322,11 @@ $(function (event) {
                 // Hide image nicely
                 var displayTime = setTimeout(function () {
                     if ($('#slideshow-image')[0].src !== '') {
-                        console.log('Display timeout, hidding picture.');
+                        console.log('Display timeout, hidding dimmer and picture.');
                         $('.image .bottom.dimmer').dimmer('hide');
                         $('#slideshow-image').transition(slideshowAnimationLeave, animationDuration, function () {
                             $('#slideshow-image')[0].src = '';
+                            console.log('Picture hidden.');
                         });
                     }
 
@@ -254,18 +348,17 @@ $(function (event) {
     function loadDemoSlideshow(images) {
         console.log('Loading demo slideshow...');
         console.log('Loaded image list:', images);
+        console.log('Demo duration:', (infiniteDemo !== true ? demoDuration : 'Infinite'));
 
         // Hide mouse cursor during slideshow
         $('html').css('cursor', 'none');
 
         // Adjust slideshow size
         if (document.fullscreenElement) {
-            $('.image.content.dimmable').css('height', '99vh');
-            // $('#slideshow-image').css('height', '100vh');
+            $('.image.content .dimmable').css('height', '99vh');
         }
         else {
-            $('.image.content.dimmable').css('height', '93vh');
-            // $('#slideshow-image').css('height', '93vh');
+            $('.image.content .dimmable').css('height', '90vh');
         }
 
         var limit = images.length;
@@ -274,69 +367,133 @@ $(function (event) {
         console.log('Total pictures:', limit);
         console.log('Base URL:', imagesPath);
 
-        // Stop demo after defined time
-        var demoStop = setTimeout(function () {
-            demoStopped = true;
+        // Limited time demo
+        if (infiniteDemo === false) {
+            // Stop demo after defined time
+            var demoStop = setTimeout(function () {
+                demoStopped = true;
 
-            if (slideshow) {
-                console.log('Slideshow finished.');
-                clearInterval(slideshow);
+                if (slideshow) {
+                    console.log('Slideshow finished.');
+                    clearInterval(slideshow);
+                }
+
+                console.log('End of demo.');
+
+                // Show mouse cursor when slideshow is finished
+                $('html').css('cursor', 'default');
+
+                // Update main container content
+                $('.ui.basic.inverted.segment').addClass('very padded center aligned');
+                $('.ui.basic.inverted.segment').html('<h1>End of demo</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
+
+                var delayedModalHide = setTimeout(function () {
+                    $('.modal').modal('hide');
+
+                    if ($('.modal').modal('is active') === false) {
+                        console.log('Modal closed.');
+                    }
+
+                    clearTimeout(delayedModalHide);
+                }, modalHideTimeout);
+
+                clearTimeout(demoStop);
+            }, demoDuration);
+
+            // Display all received pictures
+            if (limit !== 0) {
+                // Load initial picture
+                loadDemoPictures(images, imagesPath);
+
+                // Load all other pictures
+                var slideshow = setInterval(function () {
+                    // Continue till we have pictures to display
+                    if (limit !== 0) {
+                        limit--;
+
+                        // Display slideshow header nicely
+                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                            console.log('Display slideshow header...');
+                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                        }
+
+                        // Adjust slideshow size
+                        if (document.fullscreenElement) {
+                            $('.image.content .dimmable').css('height', '99vh');
+                        }
+                        else {
+                            $('.image.content .dimmable').css('height', '90vh');
+                        }
+
+                        console.log('Pictures left:', limit);
+
+                        loadDemoPictures(images, imagesPath);
+                    }
+                }, slideshowPauseDuration);
+            }
+        }
+
+        // Infinite demo
+        else {
+            // Display all received pictures
+            if (limit !== 0) {
+                // Load initial picture
+                loadDemoPictures(images, imagesPath);
+
+                // Load all other pictures
+                var slideshow = setInterval(function () {
+                    // Continue till we have pictures to display
+                    if (limit !== 0) {
+                        limit--;
+
+                        // Display slideshow header nicely
+                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                            console.log('Display slideshow header...');
+                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                        }
+
+                        // Adjust slideshow size
+                        if (document.fullscreenElement) {
+                            $('.image.content .dimmable').css('height', '99vh');
+                        }
+                        else {
+                            $('.image.content .dimmable').css('height', '90vh');
+                        }
+
+                        console.log('Pictures left:', limit);
+
+                        loadDemoPictures(images, imagesPath);
+                    }
+                }, slideshowPauseDuration);
             }
 
-            console.log('End of demo.');
+            // All pictures displayed, reloading
+            else {
+                console.log('End of demo slideshow.');
+                console.log('Reloading in 5 seconds...');
 
-            // Show mouse cursor when slideshow is finished
-            $('html').css('cursor', 'default');
+                // Show mouse cursor when slideshow is finished
+                $('html').css('cursor', 'default');
 
-            // Update main container content
-            $('.ui.basic.inverted.segment').addClass('very padded center aligned');
-            $('.ui.basic.inverted.segment').html('<h1>End of demo</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
+                // Update main container content
+                $('.ui.basic.inverted.segment').addClass('very padded center aligned');
+                $('.ui.basic.inverted.segment').html('<h1>End of demo slideshow</h1><br><button class="ui inverted primary button" id="btnReload">Reloading...</button>');
 
-            var delayedModalHide = setTimeout(function () {
-                $('.modal').modal('hide');
+                // Reload counter
+                var reloadTimeInSeconds = 5;
+                var reloadCounter = setInterval(function () {
+                    $('#btnReload').html('Reload in ' + reloadTimeInSeconds + ' seconds...');
 
-                if ($('.modal').modal('is active') === false) {
-                    console.log('Modal closed.');
-                }
+                    reloadTimeInSeconds--;
 
-                clearTimeout(delayedModalHide);
-            }, modalHideTimeout);
+                    if (reloadTimeInSeconds === 0) {
+                        // Reload demo slideshow
+                        loadDemoSlideshow(images);
 
-            clearTimeout(demoStop);
-        }, demoDuration);
-
-        // Display all received pictures
-        if (limit !== 0) {
-            // Load initial picture
-            loadDemoPictures(images, imagesPath);
-
-            // Load all other pictures
-            var slideshow = setInterval(function () {
-                // Continue till we have pictures to display
-                if (limit !== 0) {
-                    limit--;
-
-                    // Display slideshow header nicely
-                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                        console.log('Display slideshow header...');
-                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                        clearInterval(reloadCounter);
                     }
-
-                    // Adjust slideshow size
-                    if (document.fullscreenElement) {
-                        $('.image.content.dimmable').css('height', '99vh');
-                        // $('#slideshow-image').css('height', '100%');
-                    }
-                    else {
-                        $('.image.content.dimmable').css('height', '93vh');
-                        // $('#slideshow-image').css('height', '93vh');
-                    }
-
-                    console.log('Pictures left:', limit);
-
-                    loadDemoPictures(images, imagesPath);
-                }
-            }, slideshowPauseDuration);
+                }, 1000);
+            }
         }
     }
 
@@ -348,8 +505,7 @@ $(function (event) {
 
         if (typeof images[randomImageId] !== 'undefined' && demoStopped === false) {
             var randomPicture = images[randomImageId];
-            // var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100);
-            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 10);
+            var randomPictureURL = source + images[randomImageId].id + '/' + (window.innerWidth - 40) + '/' + (window.innerHeight - 100);
 
             console.log('New image:', randomPicture);
             console.log('Loading new picture [' + randomPictureURL + '].');
@@ -381,6 +537,7 @@ $(function (event) {
                             $('#picture-metas').html(html);
 
                             var delayedDimmerAnimation = setTimeout(function () {
+                                console.log('Picture loaded, showing dimmer.');
                                 $('.image .bottom.dimmer').dimmer('show');
                                 clearTimeout(delayedDimmerAnimation);
                             }, animationLoadingTime);
@@ -397,6 +554,7 @@ $(function (event) {
             var displayTime = setTimeout(function () {
                 if ($('#slideshow-image')[0].src !== '') {
                     console.log('Display timeout, hidding picture.');
+                    console.log('Picture hidden, hiding dimmer.');
                     $('.image .bottom.dimmer').dimmer('hide');
                     $('#slideshow-image').transition(slideshowAnimationLeave, animationDuration, function () {
                         $('#slideshow-image')[0].src = '';
