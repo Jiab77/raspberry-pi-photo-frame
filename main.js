@@ -78,7 +78,7 @@ $(function (event) {
 
         // Changing metas display style (required for left alignment)
         $('#picture-metas').css('width', 'inherit');
-        $('#picture-metas').css('padding-left', '1.2rem');
+        $('#picture-metas').css('padding-left', '1rem');
 
         // Adjust slideshow size
         if (document.fullscreenElement) {
