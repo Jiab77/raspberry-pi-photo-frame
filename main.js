@@ -78,7 +78,7 @@ $(function (event) {
 
         // Changing metas display style (required for left alignment)
         $('#picture-metas').css('width', 'inherit');
-        $('#picture-metas').css('padding-left', '1rem');
+        // $('#picture-metas').css('padding-left', '1rem');
 
         // Adjust slideshow size
         if (document.fullscreenElement) {
@@ -98,112 +98,55 @@ $(function (event) {
         console.log('Total pictures:', limit);
         console.log('Base URL:', baseURL);
 
-        // Linear slideshow
-        if (infiniteSlideshow === false) {
-            // Stop slideshow when all pictures are displayed
-            var slideshowStop = setInterval(function () {
-                if (limit === 0) {
-                    slideshowStopped = true;
+        // Init slideshow
+        var slideshowStop = setInterval(function () {
+            // All pictures displayed, stopping
+            if (limit === 0 && infiniteSlideshow === false) {
+                slideshowStopped = true;
 
-                    if (slideshow) {
-                        console.log('Slideshow finished.');
-                        clearInterval(slideshow);
-                    }
-
-                    console.log('No more pictures to display.');
-
-                    // Show mouse cursor when slideshow is finished
-                    $('html').css('cursor', 'default');
-
-                    // Update main container content
-                    $('.ui.basic.inverted.segment').addClass('very padded center aligned');
-                    $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
-
-                    var delayedModalHide = setTimeout(function () {
-                        $('.modal').modal('hide');
-
-                        if ($('.modal').modal('is active') === false) {
-                            console.log('Modal closed.');
-                        }
-
-                        clearTimeout(delayedModalHide);
-                    }, modalHideTimeout);
-
-                    clearInterval(slideshowStop);
+                if (slideshow) {
+                    console.log('End of slideshow.');
+                    clearInterval(slideshow);
                 }
-            }, slideshowPauseDuration);
 
-            // Display all received pictures
-            if (limit !== 0) {
-                // Load initial picture
-                loadPictures(images, baseURL);
+                console.log('No more pictures to display.');
 
-                // Load all other pictures
-                var slideshow = setInterval(function () {
-                    // Continue till we have pictures to display
-                    if (limit !== 0) {
-                        limit--;
+                // Hiding modal
+                var delayedModalHide = setTimeout(function () {
+                    $('.modal').modal('hide');
 
-                        // Display slideshow header nicely
-                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                            console.log('Display slideshow header...');
-                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
-                        }
-
-                        // Adjust slideshow size
-                        if (document.fullscreenElement) {
-                            $('.image.content .dimmable').css('height', '97vh');
-                        }
-                        else {
-                            $('.image.content .dimmable').css('height', '90vh');
-                        }
-
-                        console.log('Pictures left:', limit);
-
-                        loadPictures(images, imagesPath);
+                    if ($('.modal').modal('is active') === false) {
+                        console.log('Modal closed.');
                     }
-                }, slideshowPauseDuration);
-            }
-        }
 
-        // Infinite slideshow
-        else {
-            // Display all received pictures
-            if (limit !== 0) {
-                // Load initial picture
-                loadPictures(images, baseURL);
+                    clearTimeout(delayedModalHide);
+                }, modalHideTimeout);
 
-                // Load all other pictures
-                var slideshow = setInterval(function () {
-                    // Continue till we have pictures to display
-                    if (limit !== 0) {
-                        limit--;
+                // Show mouse cursor when slideshow is finished
+                $('html').css('cursor', 'default');
 
-                        // Display slideshow header nicely
-                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                            console.log('Display slideshow header...');
-                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
-                        }
+                // Update main container content
+                $('.ui.basic.inverted.segment').addClass('very padded center aligned');
+                $('.ui.basic.inverted.segment').html('<h1>End of slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
 
-                        // Adjust slideshow size
-                        if (document.fullscreenElement) {
-                            $('.image.content .dimmable').css('height', '97vh');
-                        }
-                        else {
-                            $('.image.content .dimmable').css('height', '90vh');
-                        }
-
-                        console.log('Pictures left:', limit);
-
-                        loadPictures(images, imagesPath);
-                    }
-                }, slideshowPauseDuration);
+                clearInterval(slideshowStop);
             }
 
             // All pictures displayed, reloading
-            else {
+            if (limit === 0 && infiniteSlideshow === true) {
                 console.log('End of slideshow.');
                 console.log('Reloading in 5 seconds...');
+
+                // Hiding modal
+                var delayedModalHide = setTimeout(function () {
+                    $('.modal').modal('hide');
+
+                    if ($('.modal').modal('is active') === false) {
+                        console.log('Modal closed.');
+                    }
+
+                    clearTimeout(delayedModalHide);
+                }, modalHideTimeout);
 
                 // Show mouse cursor when slideshow is finished
                 $('html').css('cursor', 'default');
@@ -217,16 +160,51 @@ $(function (event) {
                 var reloadCounter = setInterval(function () {
                     $('#btnReload').html('Reload in ' + reloadTimeInSeconds + ' seconds...');
 
-                    reloadTimeInSeconds--;
-
                     if (reloadTimeInSeconds === 0) {
+                        // Clear all intervals
+                        clearInterval(reloadCounter);
+                        clearInterval(slideshow);
+                        clearInterval(slideshowStop);
+
                         // Reload slideshow
                         loadSlideshow(images);
-
-                        clearInterval(reloadCounter);
                     }
+
+                    reloadTimeInSeconds--;
                 }, 1000);
             }
+        }, slideshowPauseDuration);
+
+        // Display all received pictures
+        if (limit !== 0) {
+            // Load initial picture
+            loadPictures(images, baseURL);
+
+            // Load all other pictures
+            var slideshow = setInterval(function () {
+                // Continue till we have pictures to display
+                if (limit !== 0) {
+                    limit--;
+
+                    // Display slideshow header nicely
+                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                        console.log('Display slideshow header...');
+                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                    }
+
+                    // Adjust slideshow size
+                    if (document.fullscreenElement) {
+                        $('.image.content .dimmable').css('height', '97vh');
+                    }
+                    else {
+                        $('.image.content .dimmable').css('height', '90vh');
+                    }
+
+                    console.log('Pictures left:', limit);
+
+                    loadPictures(images, imagesPath);
+                }
+            }, slideshowPauseDuration);
         }
     }
 
@@ -298,7 +276,6 @@ $(function (event) {
                             if (typeof randomPicture.name !== 'undefined') {
                                 var html  = '<div class="ui basic left aligned segment">';
                                     html += '<strong>File:</strong>&nbsp;<span>' + randomPicture.name + '</span>';
-                                    // html += '&nbsp;&ndash;&nbsp;';
                                     html += '<br><br>';
                                     html += '<strong>Date:</strong>&nbsp;<span>' + fileDate.toLocaleDateString(fileDateLang, fileDateOptions) + '</span>';
                                     html += '</div>';
@@ -306,8 +283,10 @@ $(function (event) {
                                 $('#picture-metas').html(html);
 
                                 var delayedDimmerAnimation = setTimeout(function () {
-                                    console.log('Picture loaded, showing dimmer.');
+                                    console.log('Metas defined, showing dimmer.');
+
                                     $('.image .bottom.dimmer').dimmer('show');
+
                                     clearTimeout(delayedDimmerAnimation);
                                 }, animationLoadingTime);
                             }
@@ -322,11 +301,12 @@ $(function (event) {
                 // Hide image nicely
                 var displayTime = setTimeout(function () {
                     if ($('#slideshow-image')[0].src !== '') {
-                        console.log('Display timeout, hidding dimmer and picture.');
+                        console.log('Display timeout reached, hidding dimmer and picture.');
+
                         $('.image .bottom.dimmer').dimmer('hide');
+
                         $('#slideshow-image').transition(slideshowAnimationLeave, animationDuration, function () {
                             $('#slideshow-image')[0].src = '';
-                            console.log('Picture hidden.');
                         });
                     }
 
@@ -367,10 +347,10 @@ $(function (event) {
         console.log('Total pictures:', limit);
         console.log('Base URL:', imagesPath);
 
-        // Limited time demo
-        if (infiniteDemo === false) {
-            // Stop demo after defined time
-            var demoStop = setTimeout(function () {
+        // Init demo slideshow
+        var demoStop = setTimeout(function () {
+            // Demo duration reached, stopping
+            if (infiniteDemo === false) {
                 demoStopped = true;
 
                 if (slideshow) {
@@ -378,15 +358,9 @@ $(function (event) {
                     clearInterval(slideshow);
                 }
 
-                console.log('End of demo.');
+                console.log('End of demo slideshow.');
 
-                // Show mouse cursor when slideshow is finished
-                $('html').css('cursor', 'default');
-
-                // Update main container content
-                $('.ui.basic.inverted.segment').addClass('very padded center aligned');
-                $('.ui.basic.inverted.segment').html('<h1>End of demo</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
-
+                // Hiding modal
                 var delayedModalHide = setTimeout(function () {
                     $('.modal').modal('hide');
 
@@ -397,80 +371,31 @@ $(function (event) {
                     clearTimeout(delayedModalHide);
                 }, modalHideTimeout);
 
+                // Show mouse cursor when slideshow is finished
+                $('html').css('cursor', 'default');
+
+                // Update main container content
+                $('.ui.basic.inverted.segment').addClass('very padded center aligned');
+                $('.ui.basic.inverted.segment').html('<h1>End of demo slideshow</h1><br><button class="ui inverted primary button" onclick="window.location.reload();">Restart</button>');
+
                 clearTimeout(demoStop);
-            }, demoDuration);
-
-            // Display all received pictures
-            if (limit !== 0) {
-                // Load initial picture
-                loadDemoPictures(images, imagesPath);
-
-                // Load all other pictures
-                var slideshow = setInterval(function () {
-                    // Continue till we have pictures to display
-                    if (limit !== 0) {
-                        limit--;
-
-                        // Display slideshow header nicely
-                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                            console.log('Display slideshow header...');
-                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
-                        }
-
-                        // Adjust slideshow size
-                        if (document.fullscreenElement) {
-                            $('.image.content .dimmable').css('height', '99vh');
-                        }
-                        else {
-                            $('.image.content .dimmable').css('height', '90vh');
-                        }
-
-                        console.log('Pictures left:', limit);
-
-                        loadDemoPictures(images, imagesPath);
-                    }
-                }, slideshowPauseDuration);
-            }
-        }
-
-        // Infinite demo
-        else {
-            // Display all received pictures
-            if (limit !== 0) {
-                // Load initial picture
-                loadDemoPictures(images, imagesPath);
-
-                // Load all other pictures
-                var slideshow = setInterval(function () {
-                    // Continue till we have pictures to display
-                    if (limit !== 0) {
-                        limit--;
-
-                        // Display slideshow header nicely
-                        if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
-                            console.log('Display slideshow header...');
-                            $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
-                        }
-
-                        // Adjust slideshow size
-                        if (document.fullscreenElement) {
-                            $('.image.content .dimmable').css('height', '99vh');
-                        }
-                        else {
-                            $('.image.content .dimmable').css('height', '90vh');
-                        }
-
-                        console.log('Pictures left:', limit);
-
-                        loadDemoPictures(images, imagesPath);
-                    }
-                }, slideshowPauseDuration);
             }
 
             // All pictures displayed, reloading
-            else {
+            if (limit === 0 && infiniteDemo === true) {
                 console.log('End of demo slideshow.');
                 console.log('Reloading in 5 seconds...');
+
+                // Hiding modal
+                var delayedModalHide = setTimeout(function () {
+                    $('.modal').modal('hide');
+
+                    if ($('.modal').modal('is active') === false) {
+                        console.log('Modal closed.');
+                    }
+
+                    clearTimeout(delayedModalHide);
+                }, modalHideTimeout);
 
                 // Show mouse cursor when slideshow is finished
                 $('html').css('cursor', 'default');
@@ -484,16 +409,51 @@ $(function (event) {
                 var reloadCounter = setInterval(function () {
                     $('#btnReload').html('Reload in ' + reloadTimeInSeconds + ' seconds...');
 
-                    reloadTimeInSeconds--;
-
                     if (reloadTimeInSeconds === 0) {
+                        // Clear all intervals
+                        clearInterval(reloadCounter);
+                        clearInterval(slideshow);
+                        clearInterval(demoStop);
+
                         // Reload demo slideshow
                         loadDemoSlideshow(images);
-
-                        clearInterval(reloadCounter);
                     }
+
+                    reloadTimeInSeconds--;
                 }, 1000);
             }
+        }, demoDuration);
+
+        // Display all received pictures
+        if (limit !== 0) {
+            // Load initial picture
+            loadDemoPictures(images, imagesPath);
+
+            // Load all other pictures
+            var slideshow = setInterval(function () {
+                // Continue till we have pictures to display
+                if (limit !== 0) {
+                    limit--;
+
+                    // Display slideshow header nicely
+                    if ($('.ui.overlay.fullscreen.inverted.modal .header').css('display') === 'none' && !document.fullscreenElement) {
+                        console.log('Display slideshow header...');
+                        $('.ui.overlay.fullscreen.inverted.modal .header').show('slow');
+                    }
+
+                    // Adjust slideshow size
+                    if (document.fullscreenElement) {
+                        $('.image.content .dimmable').css('height', '99vh');
+                    }
+                    else {
+                        $('.image.content .dimmable').css('height', '90vh');
+                    }
+
+                    console.log('Pictures left:', limit);
+
+                    loadDemoPictures(images, imagesPath);
+                }
+            }, slideshowPauseDuration);
         }
     }
 
@@ -537,8 +497,10 @@ $(function (event) {
                             $('#picture-metas').html(html);
 
                             var delayedDimmerAnimation = setTimeout(function () {
-                                console.log('Picture loaded, showing dimmer.');
+                                console.log('Metas defined, showing dimmer.');
+
                                 $('.image .bottom.dimmer').dimmer('show');
+
                                 clearTimeout(delayedDimmerAnimation);
                             }, animationLoadingTime);
                         }
@@ -553,9 +515,10 @@ $(function (event) {
             // Hide image nicely
             var displayTime = setTimeout(function () {
                 if ($('#slideshow-image')[0].src !== '') {
-                    console.log('Display timeout, hidding picture.');
-                    console.log('Picture hidden, hiding dimmer.');
+                    console.log('Display timeout reached, hidding dimmer and picture.');
+
                     $('.image .bottom.dimmer').dimmer('hide');
+
                     $('#slideshow-image').transition(slideshowAnimationLeave, animationDuration, function () {
                         $('#slideshow-image')[0].src = '';
                     });
