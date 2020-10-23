@@ -1,0 +1,25 @@
+{
+  "name": "raspberry-pi-photo-frame",
+  "version": "1.0.0",
+  "description": "Using a Raspberry Pi as photo frame with a nice Web UI",
+  "private": true,
+  "main": "main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^10.1.4"
+  },
+  "scripts": {
+    "start": "./start.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jiab77/raspberry-pi-photo-frame.git"
+  },
+  "author": "Jiab77 <jonathan.barda@pm.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jiab77/raspberry-pi-photo-frame/issues"
+  },
+  "homepage": "https://github.com/Jiab77/raspberry-pi-photo-frame#readme"
+}
