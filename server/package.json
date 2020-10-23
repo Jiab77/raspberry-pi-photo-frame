@@ -7,10 +7,17 @@
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jiab77 <jonathan.barda@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jiab77/simple-nodejs-webserver.git"
+  },
+  "author": "Jiab77 <jonathan.barda@pm.me>",
   "license": "MIT",
-  "homepage": "https://github.com/Jiab77/simple-nodejs-webserver"
+  "bugs": {
+    "url": "https://github.com/Jiab77/simple-nodejs-webserver/issues"
+  },
+  "homepage": "https://github.com/Jiab77/simple-nodejs-webserver#readme"
 }
