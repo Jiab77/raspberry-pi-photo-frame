@@ -28,7 +28,7 @@ sudo apt install git nodejs
 # Install Lubuntu core
 sudo apt install lubuntu-core
 
-# Install chromium
+# Install chromium (optional -- if using electronjs)
 sudo apt install chromium-browser chromium-browser-l10n
 
 # Reboot to apply changes
@@ -144,13 +144,32 @@ free -mlht
 git clone https://github.com/Jiab77/raspberry-pi-photo-frame.git
 ```
 
-### Settings
+## Install dependencies
 
-#### Demo
+```bash
+# Install nodejs
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install npm
+sudo apt install -y npm
+
+# Install nodejs dependencies
+cd raspberry-pi-photo-frame
+npm install
+```
+
+> For other platforms, please go to https://github.com/nodesource/distributions/blob/master/README.md#table-of-contents.
+
+## Settings
+
+You can change the project settings according to your needs.
+
+### Demo
 
 By default it will display pictures from [Lorem Picsum](https://picsum.photos/).
 
-Edit the file `main.js` to the following settings:
+Edit the file `slideshow.js` to the following settings:
 
 ```js
 // Demo settings
@@ -165,11 +184,11 @@ Effects:
 * `demoDuration`: (duration in milliseconds) - Change the demo duration
 * `infiniteDemo`: (`true`|`false`) - Make the demo infinite or not
 
-#### Slideshow
+### Slideshow
 
 By default the slideshow is now infinite instead of stopping when all pictures are displayed.
 
-Edit the file `main.js` to the following settings:
+Edit the file `slideshow.js` to the following settings:
 
 ```js
 // Slideshow settings
@@ -192,7 +211,7 @@ Effects:
 * `animationDuration`: (duration in milliseconds) - Display animation duration
 * `animationLoadingTime`: (duration in milliseconds) - Waiting time duration before running display animation
 
-### Add the startup script in desktop autostart
+## Add the startup script in desktop autostart
 
 According to the documentation, you simply add a new line in `~/.config/lxsession/LXDE/autostart`:
 
