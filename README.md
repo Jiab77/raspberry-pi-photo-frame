@@ -273,13 +273,13 @@ killall -KILL chromium-browser
 cd raspberry-pi-photo-frame
 
 # Cancel your local changes
-git checkout main.js
+git checkout *
 
 # Get the latest version
 git pull
 
 # Disable demo mode
-sed -e 's/loadDemo = true/loadDemo = false/' -i main.js
+sed -e 's/loadDemo = true/loadDemo = false/' -i slideshow.js
 
 # Restart the slideshow
 ~/start.sh
