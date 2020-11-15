@@ -4,6 +4,7 @@
 # sleep 30
 
 # Start server
+cd raspberry-pi-photo-frame
 NODE_WEB_HOST=0.0.0.0 node server/server.js &
 
 # Wait for server to start
