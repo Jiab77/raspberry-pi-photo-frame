@@ -192,39 +192,13 @@ Effects:
 * `animationDuration`: (duration in milliseconds) - Display animation duration
 * `animationLoadingTime`: (duration in milliseconds) - Waiting time duration before running display animation
 
-### Create startup script
-
-Now to autostart Chromium with the slideshow, simply create the following starting script:
-
-```bash
-#!/bin/bash
-
-# Wait for desktop start
-sleep 30
-
-# Start server
-cd raspberry-pi-photo-frame
-NODE_WEB_HOST=0.0.0.0 node server/server.js &
-
-# Wait for server to start
-sleep 5
-
-# Start browser
-chromium-browser --temp-profile --incognito --app=http://127.0.0.1:8001
-
-# Kill server
-killall -KILL node
-```
-
-Save it as `start-slideshow.sh` and make it executable with: `chmod -v +x start-slideshow.sh`.
-
-### Add the script in desktop autostart
+### Add the startup script in desktop autostart
 
 According to the documentation, you simply add a new line in `~/.config/lxsession/LXDE/autostart`:
 
 ```bash
 # Add new startup line
-echo "@${HOME}/start-slideshow.sh" | tee -a ~/.config/lxsession/LXDE/autostart
+echo "@${HOME}/raspberry-pi-photo-frame/start.sh" | tee -a ~/.config/lxsession/LXDE/autostart
 
 # Verify the result
 cat ~/.config/lxsession/LXDE/autostart
@@ -237,7 +211,7 @@ Restart to see the result.
 > To remove from autostart, simply delete or comment the line from `~/.config/lxsession/LXDE/autostart`:
 >
 > ```bash
-> sed -e 's|@'${HOME}'/start-slideshow.sh|# @'${HOME}'/start-slideshow.sh|' -i ~/.config/lxsession/LXDE/autostart
+> sed -e 's|@'${HOME}'/raspberry-pi-photo-frame/start.sh|# @'${HOME}'/raspberry-pi-photo-frame/start.sh|' -i ~/.config/lxsession/LXDE/autostart
 > ```
 >
 > Then restart.
@@ -289,7 +263,7 @@ git pull
 sed -e 's/loadDemo = true/loadDemo = false/' -i main.js
 
 # Restart the slideshow
-~/start-slideshow.sh
+~/start.sh
 ```
 
 ## Preview
